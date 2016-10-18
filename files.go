@@ -2,14 +2,14 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"html/template"
 	"os"
 )
 
 const (
-	configFilename      = "askenv"
-	setupScriptFilename = "setup.sh"
+	askInstallerStateFilename = "ask-install.json"
+	setupScriptFilename       = "setup.sh"
 )
 
 var (
@@ -19,40 +19,14 @@ var (
 )
 
 // CreateDockerComposeFile will template out the docker-compose.yml file.
-func CreateDockerComposeFile(cayport string) error {
+func CreateDockerComposeFile(config Config) error {
 	f, err := os.Create("docker-compose.yml")
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	ctx := map[string]string{
-		"Port":           cayport,
-		"ConfigFilename": configFilename,
-	}
-
-	if err := dockerComposeTemplate.Execute(f, ctx); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// CreateConfigFile will create the askenv configuration file.
-func CreateConfigFile(config [][]string) error {
-	f, err := os.Create(configFilename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	for _, configline := range config {
-		if _, err := fmt.Fprintf(f, "%s=%s\n", configline[0], configline[1]); err != nil {
-			return err
-		}
-	}
-
-	if _, err := fmt.Fprint(f, "\n"); err != nil {
+	if err := dockerComposeTemplate.Execute(f, config); err != nil {
 		return err
 	}
 
@@ -61,14 +35,14 @@ func CreateConfigFile(config [][]string) error {
 
 // CreateSetupScript will create the setup script to start the application for
 // the first time.
-func CreateSetupScript(ctx map[string]string) error {
+func CreateSetupScript(config Config) error {
 	f, err := os.Create(setupScriptFilename)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	if err := setupScriptTemplate.Execute(f, ctx); err != nil {
+	if err := setupScriptTemplate.Execute(f, config); err != nil {
 		return err
 	}
 
@@ -76,18 +50,49 @@ func CreateSetupScript(ctx map[string]string) error {
 }
 
 // CreateCaddyFile will tempalte out the Caddyfile to be used by Caddy.
-func CreateCaddyFile(hostname string) error {
+func CreateCaddyFile(config Config) error {
 	f, err := os.Create("Caddyfile")
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	ctx := map[string]interface{}{
-		"Hostname": hostname,
+	if err := caddyfileTemplate.Execute(f, config); err != nil {
+		return err
 	}
 
-	if err := caddyfileTemplate.Execute(f, ctx); err != nil {
+	return nil
+}
+
+// LoadAskInstallState loads the state of the configuration from the filesystem.
+func LoadAskInstallState() (*Config, error) {
+	f, err := os.Open(askInstallerStateFilename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var config Config
+	if err := json.NewDecoder(f).Decode(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// CreateAskInstallState saves the state of the configuration to the filesystem.
+func CreateAskInstallState(config Config) error {
+	f, err := os.Create(askInstallerStateFilename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	e := json.NewEncoder(f)
+
+	e.SetIndent("", "  ")
+
+	if err := e.Encode(config); err != nil {
 		return err
 	}
 

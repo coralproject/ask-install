@@ -10,7 +10,10 @@ echo ""
 docker-compose up -d
 
 echo ""
-echo "Services created. Now creating user:"
+echo "Services created."
+{{ if .Password }}
+echo ""
+echo "Now creating user:"
 echo ""
 
 # Create the user.
@@ -19,4 +22,5 @@ docker-compose run --rm auth cli create -f --email "{{ .Email }}" --password "{{
 echo ""
 echo "User was created."
 echo ""
-echo "Done. Please remove this file as it contains the plaintext password."
+echo "Please remove this file as it contains the plaintext password."
+{{ end }}
