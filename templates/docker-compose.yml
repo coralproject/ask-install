@@ -1,0 +1,123 @@
+version: '2'
+
+##########################
+# Services
+##########################
+
+services:
+
+  cay:
+    image: coralproject/cay
+    restart: always
+    env_file:
+      - {{ .ConfigFilename }}
+    networks:
+      - back-shelf
+
+  askd:
+    image: coralproject/askd
+    restart: always
+    environment:
+      - "ASK_HOST=0.0.0.0:80"
+      - "ASK_LOGGING_LEVEL=1"
+      - "ASK_MONGO_URI=mongodb://shelf-mongo/test"
+      - "ASK_ENABLE_CORS=TRUE"
+    env_file:
+      - {{ .ConfigFilename }}
+    networks:
+      - back-shelf
+    depends_on:
+      - shelf-mongo
+
+  elkhorn:
+    image: coralproject/elkhorn:latest
+    restart: always
+    environment:
+      - "ASK_URL=http://askd"
+    env_file:
+      - {{ .ConfigFilename }}
+    volumes:
+      - ./elkhorn:/usr/src/app/
+    networks:
+      - back-shelf
+    depends_on:
+      - askd
+
+  auth:
+    image: coralproject/coral-auth
+    restart: always
+    environment:
+      - "CORAL_AUTH_PORT=80"
+      - "CORAL_AUTH_TRUST_PROXY=TRUE"
+      - "CORAL_AUTH_TOKEN_EXPIRY_TIME=36 hr"
+      - "CORAL_AUTH_MONGO_URL=mongodb://auth-mongo/test"
+    env_file:
+      - {{ .ConfigFilename }}
+    networks:
+      - back-auth
+    depends_on:
+      - auth-mongo
+
+  ##########################
+  # Databases
+  ##########################
+
+  shelf-mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - shelf-mongo:/data/db
+    networks:
+      - back-shelf
+
+  auth-mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - auth-mongo:/data/db
+    networks:
+      - back-auth
+
+  ##########################
+  # Web Servers
+  ##########################
+
+  caddy:
+    image: abiosoft/caddy
+    volumes:
+      - ./Caddyfile:/etc/Caddyfile
+      - caddy-certs:/root/.caddy
+    ports:
+      - "0.0.0.0:{{ .Port }}:{{ .Port }}"
+      - "0.0.0.0:443:443"
+    networks:
+      - bastion
+      - back-auth
+      - back-shelf
+    depends_on:
+      - auth
+      - askd
+      - elkhorn
+      - cay
+
+##########################
+# Service Networks
+##########################
+
+networks:
+  bastion:
+  back-shelf:
+  back-auth:
+
+##########################
+# Service Volumes
+##########################
+
+volumes:
+
+  caddy-certs:
+    external: false
+  auth-mongo:
+    external: false
+  shelf-mongo:
+    external: false

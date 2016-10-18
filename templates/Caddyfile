@@ -1,0 +1,28 @@
+{{ .Hostname }} {
+
+  # askd proxy
+  proxy /askd/ http://askd/ {
+    without /askd
+    transparent
+  }
+
+  # elkhorn proxy
+  proxy /elkhorn/ http://elkhorn:4444/ {
+    without /elkhorn
+    transparent
+  }
+
+  # auth proxy
+  proxy /auth/ http://auth/ {
+    without /auth
+    transparent
+  }
+
+  # cay
+  proxy / http://cay/ {
+    transparent
+  }
+
+  # static files
+  root /html
+}
