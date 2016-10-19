@@ -27,6 +27,7 @@ type Config struct {
 	AuthPublicKey     string
 	AuthPrivateKey    string
 	SessionSecret     string
+	Channel           string
 }
 
 // GetConfigurationFromInteractive uses prompts to request the configuration
@@ -35,6 +36,12 @@ func GetConfigurationFromInteractive() (*Config, error) {
 	color.Cyan("\nGeneral Configuration\n")
 
 	var config Config
+
+	if useStable := Confirm("Do you want to use the stable version of ask?"); useStable {
+		config.Channel = "release"
+	} else {
+		config.Channel = "latest"
+	}
 
 	fmt.Println(`
 This is where you can specify the host on which the provided server will bind

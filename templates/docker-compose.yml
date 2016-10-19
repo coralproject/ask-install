@@ -15,7 +15,7 @@ version: '2'
 services:
 
   cay:
-    image: coralproject/cay:release
+    image: coralproject/cay:{{ .Channel }}
     restart: on-failure:10
     environment:
       - "GAID={{ .GoogleAnalyticsID }}"
@@ -27,7 +27,7 @@ services:
       - back-shelf
 
   askd:
-    image: coralproject/askd:release
+    image: coralproject/askd:{{ .Channel }}
     restart: on-failure:10
     environment:
       - "ASK_HOST=0.0.0.0:80"
@@ -42,7 +42,7 @@ services:
       - shelf-mongo
 
   elkhorn:
-    image: coralproject/elkhorn:release
+    image: coralproject/elkhorn:{{ .Channel }}
     restart: on-failure:10
     environment:
       - "ASK_URL=http://askd"
@@ -62,7 +62,7 @@ services:
       - askd
 
   auth:
-    image: coralproject/coral-auth:release
+    image: coralproject/coral-auth:{{ .Channel }}
     restart: on-failure:10
     environment:
       - "CORAL_AUTH_PORT=80"
