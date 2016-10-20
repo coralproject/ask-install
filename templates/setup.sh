@@ -2,6 +2,14 @@
 
 set -e
 
+echo "Pulling service layers:"
+echo ""
+
+docker-compose pull
+
+echo "Layers pulled."
+echo ""
+
 echo "Creating the services now:"
 
 echo ""
