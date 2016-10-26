@@ -23,6 +23,7 @@ services:
       - "AUTH_AUTHORITY={{ .RootURL }}/auth/connect"
       - "ELKHORN_URL={{ .RootURL }}/elkhorn"
       - "ASK_URL={{ .RootURL }}/askd"
+      - "AUTH_ENABLED=true"
     networks:
       - back-shelf
 
