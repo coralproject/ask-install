@@ -15,6 +15,7 @@ type Config struct {
 	UseS3             bool
 	UseSSL            bool
 	S3Bucket          string
+	S3Endpoint        string
 	AWSRegion         string
 	AWSAccessKeyID    string
 	AWSAccessKey      string
@@ -93,10 +94,39 @@ otherwise, port 80, 443 will be bound to
 	color.Cyan("\nAmazon\n")
 
 	if config.UseS3 = Confirm("Do you want forms uploaded to S3?"); config.UseS3 {
-		config.S3Bucket = StringRequired("What's the S3 Bucket we can upload forms?")
-		config.AWSRegion = StringRequired("What's the S3 Region for this bucket?")
-		config.AWSAccessKeyID = StringRequired("What's the AWS_ACCESS_KEY_ID with write access?")
-		config.AWSAccessKey = StringRequired("What's the AWS_ACCESS_KEY associated with this AWS_ACCESS_KEY_ID?")
+		for {
+			config.S3Bucket = StringRequired("What's the S3 Bucket we can upload forms?")
+			config.AWSRegion = StringRequired("What's the S3 Region for this bucket?")
+			config.AWSAccessKeyID = StringRequired("What's the AWS_ACCESS_KEY_ID with write access?")
+			config.AWSAccessKey = StringRequired("What's the AWS_ACCESS_KEY associated with this AWS_ACCESS_KEY_ID?")
+
+			if ok := Confirm("Is this bucket hosted in AWS?"); ok {
+				endpoints := map[string]string{
+					"us-east-1":      "s3.amazonaws.com",
+					"us-east-2":      "s3-us-east-2.amazonaws.com",
+					"us-west-1":      "s3-us-west-1.amazonaws.com",
+					"us-west-2":      "s3-us-west-2.amazonaws.com",
+					"ap-south-1":     "s3-ap-south-1.amazonaws.com",
+					"ap-northeast-2": "s3-ap-northeast-2.amazonaws.com",
+					"ap-southeast-1": "s3-ap-southeast-1.amazonaws.com",
+					"ap-southeast-2": "s3-ap-southeast-2.amazonaws.com",
+					"ap-northeast-1": "s3-ap-northeast-1.amazonaws.com",
+					"eu-central-1":   "s3-eu-central-1.amazonaws.com",
+					"eu-west-1":      "s3-eu-west-1.amazonaws.com",
+					"sa-east-1":      "s3-sa-east-1.amazonaws.com",
+				}
+
+				if endpoint, ok := endpoints[config.AWSRegion]; ok {
+					config.S3Endpoint = endpoint
+				}
+			}
+
+			if config.S3Endpoint == "" {
+				config.S3Endpoint = StringRequired("What's the endpoint for the S3 service?")
+			}
+
+			break
+		}
 	}
 
 	color.Cyan("\nAuth\n")

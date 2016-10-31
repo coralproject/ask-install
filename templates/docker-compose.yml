@@ -49,12 +49,13 @@ services:
     environment:
       - "ASK_URL=http://askd"
       - "S3_BUCKET={{ .S3Bucket }}"
+      - "S3_BASE_URL={{ .S3Endpoint }}"
       - "AWS_REGION={{ .AWSRegion }}"
       - "AWS_ACCESS_KEY_ID={{ .AWSAccessKeyID }}"
       - "AWS_ACCESS_KEY={{ .AWSAccessKey }}"
       - "RECAPTCHA={{ .RecaptchaSecret }}"
-    {{- if not .UseS3 }}
-      - "PUBLISHED_BASE_URL={{ .RootURL }}/widgets/"
+      - "PUBLISHED_BASE_URL={{ if not .UseS3 }}{{ .RootURL }}/widgets/{{ end }}"
+    {{ if not .UseS3 }}
     volumes:
       - ./elkhorn:/usr/src/app/server/widgets
     {{ end }}
