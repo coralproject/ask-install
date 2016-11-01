@@ -4,8 +4,8 @@
 		"publish-github"
 	],
 	"Arch": "amd64",
-	"Os": "linux darwin windows",
-	"PackageVersion": "0.0.6",
+	"Os": "linux darwin",
+	"PackageVersion": "0.0.7",
 	"TaskSettings": {
 		"publish-github": {
 			"owner": "coralproject",

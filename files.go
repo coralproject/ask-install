@@ -3,8 +3,8 @@ package main
 
 import (
 	"encoding/json"
-	"html/template"
 	"os"
+	"text/template"
 )
 
 const (
