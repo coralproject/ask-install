@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 
 	"github.com/fatih/color"
@@ -10,25 +11,28 @@ import (
 
 // Config stores the answers to the questions made from the interactive console.
 type Config struct {
-	Hostname          string
-	RootURL           string
-	UseS3             bool
-	UseSSL            bool
-	S3Bucket          string
-	S3Endpoint        string
-	AWSRegion         string
-	AWSAccessKeyID    string
-	AWSAccessKey      string
-	RecaptchaSecret   string
-	GoogleAnalyticsID string
-	Email             string `json:"-"`
-	Password          string `json:"-"`
-	DisplayName       string `json:"-"`
-	Port              string
-	AuthPublicKey     string
-	AuthPrivateKey    string
-	SessionSecret     string
-	Channel           string
+	Hostname                  string
+	RootURL                   string
+	UseS3                     bool
+	UseSSL                    bool
+	S3Bucket                  string
+	S3Endpoint                string
+	AWSRegion                 string
+	AWSAccessKeyID            string
+	AWSAccessKey              string
+	RecaptchaSecret           string
+	GoogleAnalyticsID         string
+	Email                     string `json:"-"`
+	Password                  string `json:"-"`
+	DisplayName               string `json:"-"`
+	Port                      string
+	AuthPublicKey             string
+	AuthPrivateKey            string
+	SessionSecret             string
+	Channel                   string
+	SlackNotificationsEnabled bool
+	SlackHook                 string
+	SlackChannel              string
 }
 
 // GetConfigurationFromInteractive uses prompts to request the configuration
@@ -79,6 +83,45 @@ otherwise, port 80, 443 will be bound to
 		}
 
 		if ok := Confirm("External URL will be \"%s\", is that ok?", config.RootURL); ok {
+			break
+		}
+	}
+
+	if config.SlackNotificationsEnabled = Confirm("Do you want form submissions to post to a slack channel?"); config.SlackNotificationsEnabled {
+		for {
+			config.SlackHook = StringRequired("What is the slack incoming hook url?")
+
+			req, err := http.NewRequest("OPTIONS", config.SlackHook, nil)
+			if err != nil {
+				color.Red("Slack hook url is invalid: %s", err.Error())
+				continue
+			}
+
+			res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				color.Red("Slack hook url is invalid: %s", err.Error())
+				continue
+			}
+
+			// Close the body now because we don't need it.
+			res.Body.Close()
+
+			if res.StatusCode != http.StatusOK {
+				color.Red("Slack hook url is invalid: OPTIONS request did not return OK")
+				continue
+			}
+
+			break
+		}
+
+		for {
+			config.SlackChannel = StringRequired("What is the slack channel you want notifications posted? (without the #)")
+
+			if strings.Contains(config.SlackChannel, "#") {
+				color.Red("Channel should not contain a # character")
+				continue
+			}
+
 			break
 		}
 	}

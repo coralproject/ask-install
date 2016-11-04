@@ -28,6 +28,24 @@ services:
     networks:
       - back-shelf
 
+  {{ if .SlackNotificationsEnabled -}}
+  slack:
+    image: coralproject/slack-bouncer:latest
+    restart: on-failure:10
+    environment:
+      - "PORT=80"
+      - "SLACK_URL={{ .SlackHook }}"
+      - "SLACK_CHANNEL={{ .SlackChannel }}"
+      - "SLACK_USERNAME=askbot"
+      - "SLACK_ICON_EMOJI=:question:"
+      - "TARGET_URL=http://askd/"
+      - "MAPPINGS="
+    networks:
+      - back-shelf
+    depends_on:
+      - askd
+  {{- end }}
+
   askd:
     image: coralproject/askd:{{ .Channel }}
     restart: on-failure:10
@@ -128,6 +146,9 @@ services:
       - askd
       - elkhorn
       - cay
+      {{ if .SlackNotificationsEnabled -}}
+      - slack
+      {{- end }}
 
 ##########################
 # Service Networks

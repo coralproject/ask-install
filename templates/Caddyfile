@@ -8,11 +8,21 @@
 
 {{ .Hostname }} {
 
+  log stdout
+
+  {{ if .SlackNotificationsEnabled -}}
+  # slackd askd proxy
+  proxy /askd/ http://slack/ {
+    without /askd
+    transparent
+  }
+  {{- else -}}
   # askd proxy
   proxy /askd/ http://askd/ {
     without /askd
     transparent
   }
+  {{- end }}
 
   # elkhorn proxy
   proxy /elkhorn/ http://elkhorn:4444/ {
