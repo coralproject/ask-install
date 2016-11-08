@@ -1,28 +1,24 @@
 # ask-install
 
-The `ask-install` tool can be used to bootstrap an environment to run the
-Coral Project's Ask product.
+The `ask-install` tool can be used to stand up a group of Docker containers, simplifying the installation process for Coral Project's Ask product.
 
 ## Getting Started
 
-Head over to the
-[Latest release](https://github.com/coralproject/ask-install/releases/latest)
-page and download the precompiled binary there. If you would rather you can also
+- Option 1: Head over to the
+[Latest release](https://github.com/coralproject/ask-install/releases/latest/)
+page and download the precompiled binary that matched your environment. Currently the most popular is the linux option (ask-install_*_linux_amd64.tar.gz) since most newsrooms are setting up Ask on Amazon AWS via the EC2 service. . Run the binary and follow the instructions provided.
+
+- Option 2: If you would rather you can also
 compile from source provided you have a Go environment setup.
 
-Then just run the binary and follow the instructions provided.
 
-## System Requirements
+## System Requirements For The Ask Installer
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://www.docker.com/products/docker-compose)
+The source system you use to build the Ask enviornment [needs the following installed](https://docs.coralproject.net/products/ask/#software-versions):
+
+- [Docker - 1.12.1 or later](http://www.docker.com/products/docker/)
+- [Docker Compose - 1.8.1 or later](http://www.docker.com/products/docker-compose/)
 
 ## Production Use
 
-If this is to be used in production, it is required that you enable SSL and
-provide a real hostname for the machine. When you run this setup you must have
-already pointed your DNS records to your machine running these services.
-
-This installer uses the [Caddy Webserver](https://caddyserver.com/) which will
-automatically setup and manage SSL for you provided that the DNS records point
-to the machine and the docker user can bind to ports 80/443.
+If this will be used in a production environment, it is strongly recommended you enable SSL and and link the instance to a hostname (example format using a subdomain mapped from your hosted instance to a DNS A record: https://your-subdomain.domain.com) for the machine. When you run the setup you must have the DNS records in place and working.
