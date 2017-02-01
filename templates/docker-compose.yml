@@ -95,6 +95,7 @@ services:
       - "CORAL_AUTH_SESSION_SECRET={{ .SessionSecret }}"
       - "CORAL_AUTH_ALLOWED_CLIENTS=cay {{ .RootURL }}/callback"
       - "CORAL_AUTH_ROOT_URL={{ .RootURL }}/auth"
+      - "CORAL_AUTH_DISABLE_FRAMEGUARD={{ if .UseWordpress }}TRUE{{ else }}FALSE{{ end }}"
     networks:
       - back-auth
     depends_on:

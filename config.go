@@ -15,6 +15,7 @@ type Config struct {
 	RootURL                   string
 	UseS3                     bool
 	UseSSL                    bool
+	UseWordpress              bool
 	S3Bucket                  string
 	S3Endpoint                string
 	AWSRegion                 string
@@ -86,6 +87,8 @@ otherwise, port 80, 443 will be bound to
 			break
 		}
 	}
+
+	config.UseWordpress = Confirm("Do you want to use the Wordpress integration?")
 
 	if config.SlackNotificationsEnabled = Confirm("Do you want form submissions to post to a slack channel?"); config.SlackNotificationsEnabled {
 		for {
