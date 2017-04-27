@@ -126,7 +126,7 @@ services:
   ##########################
 
   caddy:
-    image: abiosoft/caddy:latest
+    image: abiosoft/caddy:0.9.5
     volumes:
       - ./Caddyfile:/etc/Caddyfile
       {{- if not .UseS3 }}
