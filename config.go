@@ -141,10 +141,10 @@ otherwise, port 80, 443 will be bound to
 
 	if config.UseS3 = Confirm("Do you want forms uploaded to S3?"); config.UseS3 {
 		for {
-			config.S3Bucket = StringRequired("What's the S3 Bucket we can upload forms?")
+			config.S3Bucket = StringRequired("What's the name of the S3 Bucket we can upload forms to?")
 			config.AWSRegion = StringRequired("What's the S3 Region for this bucket?")
-			config.AWSAccessKeyID = StringRequired("What's the AWS_ACCESS_KEY_ID with write access?")
-			config.AWSAccessKey = StringRequired("What's the AWS_ACCESS_KEY associated with this AWS_ACCESS_KEY_ID?")
+			config.AWSAccessKeyID = StringRequired("What's the AWS_ACCESS_KEY_ID with write access to this bucket?")
+			config.AWSAccessKey = StringRequired("What's the AWS_SECRET_ACCESS_KEY associated with this AWS_ACCESS_KEY_ID?")
 
 			if ok := Confirm("Is this bucket hosted in AWS?"); ok {
 				endpoints := map[string]string{
